@@ -44,6 +44,7 @@ about:
   summary: SQL databases in Python, designed for simplicity, compatibility, and robustness.
   doc_url: https://sqlmodel.tiangolo.com/
   license: MIT
+  license_family: MIT
   license_file: LICENSE
   description: |
     SQLModel is designed to simplify interacting with SQL databases in FastAPI
@@ -53,6 +54,7 @@ about:
      the best developer experience possible. SQLModel is, in fact, a thin layer
      on top of Pydantic and SQLAlchemy, carefully designed to be compatible with
      both.
+  dev_url: https://github.com/tiangolo/sqlmodel
 
 extra:
   recipe-maintainers:
