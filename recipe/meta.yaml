@@ -31,11 +31,13 @@ test:
   commands:
     - pip check
     # Extract the version of the built package
-    - VERSION=$(python -c 'from importlib import metadata; print(metadata.version("sqlmodel"))') # [not win]
+    - VERSION=$(python -c 'from importlib import metadata; print(metadata.version("sqlmodel"))')  # [not win]
     - echo "sqlmodel version $VERSION"  # [not win]
     # Ensure that version is not 0. (This conditional looks redundant, but YAML thinks
-    # that [...] denotes a list.)
+     # that [...] denotes a list.)
     - if [ "0" == "$VERSION" ]; then false; fi  # [not win]
+    # Windows version check
+    - python -c "from importlib import metadata; v = metadata.version('sqlmodel'); print(f'sqlmodel version {v}'); assert v != '0'"  # [win]
   requires:
     - pip
 
