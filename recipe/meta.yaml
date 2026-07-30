@@ -1,19 +1,18 @@
 {% set name = "sqlmodel" %}
-{% set version = "0.0.24" %}
-
+{% set version = "0.0.39" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/sqlmodel-{{ version }}.tar.gz
-  sha256: cc5c7613c1a5533c9c7867e1aab2fd489a76c9e8a061984da11b4e613c182423
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/sqlmodel-{{ version }}.tar.gz
+  sha256: 23d8e50a8d8ee936032ed79c55023a5d618dd6bc3c510bbf4909d1a7a605a570
 
 build:
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
-  skip: true  # [py<38]
+  skip: true  # [py<310]
 
 requirements:
   host:
@@ -23,16 +22,34 @@ requirements:
   run:
     - python
     - sqlalchemy >=2.0.14,<2.1.0
-    - pydantic >=1.10.13,<3.0.0
+    - pydantic >=2.11.0
+    - typing_extensions >=4.5.0
 
+# These tests require upstream scripts unavailable
+# in the conda test environment.
+{% set ignore_tests = "--ignore=tests/test_prepare_release.py" %}
+{% set deselect_tests = "--deselect=tests/test_select_gen.py::test_select_gen" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_tutorial/test_create_db_and_table[tutorial001_py310]" %}
 test:
+  source_files:
+    - tests
+    - docs_src
   imports:
     - sqlmodel
   commands:
     - pip check
     - python -c "from importlib import metadata; v = metadata.version('sqlmodel'); print(f'sqlmodel version {v}'); assert v != '0'"
+    - pytest -v tests {{ ignore_tests }} {{ deselect_tests }}
   requires:
     - pip
+    - coverage >=6.2
+    - dirty-equals >=0.11
+    - fastapi >=0.128.0
+    - httpx >=0.28.1
+    - jinja2 >=3.1.6
+    - pytest >=7.0.1
+    - typer >=0.24.1
+    - typing-extensions >=4.15.0
 
 about:
   home: https://github.com/tiangolo/sqlmodel
@@ -43,12 +60,12 @@ about:
   license_file: LICENSE
   description: |
     SQLModel is designed to simplify interacting with SQL databases in FastAPI
-     applications, it was created by the same author. It combines SQLAlchemy
-     and Pydantic and tries to simplify the code you write as much as possible,
-     allowing you to reduce the code duplication to a minimum, but while getting
-     the best developer experience possible. SQLModel is, in fact, a thin layer
-     on top of Pydantic and SQLAlchemy, carefully designed to be compatible with
-     both.
+    applications, it was created by the same author. It combines SQLAlchemy
+    and Pydantic and tries to simplify the code you write as much as possible,
+    allowing you to reduce the code duplication to a minimum, but while getting
+    the best developer experience possible. SQLModel is, in fact, a thin layer
+    on top of Pydantic and SQLAlchemy, carefully designed to be compatible with
+    both.
   dev_url: https://github.com/tiangolo/sqlmodel
 
 extra:
