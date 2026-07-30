@@ -2,7 +2,7 @@
 {% set version = "0.0.39" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
@@ -25,14 +25,31 @@ requirements:
     - pydantic >=2.11.0
     - typing_extensions >=4.5.0
 
+# These tests require upstream scripts unavailable
+# in the conda test environment.
+{% set ignore_tests = "--ignore=tests/test_prepare_release.py" %}
+{% set deselect_tests = "--deselect=tests/test_select_gen.py::test_select_gen" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_tutorial/test_create_db_and_table[tutorial001_py310]" %}
 test:
+  source_files:
+    - tests
+    - docs_src
   imports:
     - sqlmodel
   commands:
     - pip check
     - python -c "from importlib import metadata; v = metadata.version('sqlmodel'); print(f'sqlmodel version {v}'); assert v != '0'"
+    - pytest -v tests {{ ignore_tests }} {{ deselect_tests }}
   requires:
     - pip
+    - coverage >=6.2
+    - dirty-equals >=0.11
+    - fastapi >=0.128.0
+    - httpx >=0.28.1
+    - jinja2 >=3.1.6
+    - pytest >=7.0.1
+    - typer >=0.24.1
+    - typing-extensions >=4.15.0
 
 about:
   home: https://github.com/tiangolo/sqlmodel
